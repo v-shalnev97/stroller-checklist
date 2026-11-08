@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#143b36">
+  <title>Выбор коляски — интерактивный чек-лист</title>
+  <style>
+    :root{--ink:#20312f;--muted:#657772;--bg:#f5f7f5;--surface:#fff;--line:#dfe8e3;--accent:#176d5d;--accent-soft:#e7f3ee;--bad:#ad4545;--bad-bg:#fff1ef;--gold:#9d6820;--gold-bg:#fff5e5;--radius:16px}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;font-size:15px;line-height:1.45}
+    button,input,select,textarea{font:inherit}button{cursor:pointer}button:disabled{opacity:.5;cursor:not-allowed}
+    .wrap{max-width:1080px;margin:auto;padding:0 15px 70px}
+    .hero{background:linear-gradient(132deg,#143b36,#226a5d);color:#fff;padding:26px 0 32px;margin-bottom:18px}
+    .eyebrow{font-weight:700;letter-spacing:.13em;font-size:11px;text-transform:uppercase;color:#b9e0d1}
+    h1{font-size:clamp(27px,5vw,38px);line-height:1.12;letter-spacing:-.035em;margin:9px 0 10px}
+    .hero p{max-width:700px;margin:0;color:#d7eee5;font-size:14px}.chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:15px}.chip{border:1px solid #ffffff3f;background:#ffffff17;padding:5px 10px;border-radius:40px;font-size:12px}
+    h2{font-size:21px;letter-spacing:-.02em;margin:5px 0 12px}h3{font-size:16px;margin:0}
+    .panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:17px;margin-bottom:14px;box-shadow:0 3px 14px #0d342509}
+    .field-grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px}.field label,.note-label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;font-weight:650}
+    .field input,.field select,.note-field,.note{background:#fff;width:100%;border:1px solid #cfdbd4;border-radius:10px;min-height:43px;padding:10px 12px;color:var(--ink);outline:none}
+    .field input:focus,.field select:focus,.note:focus{border-color:var(--accent);box-shadow:0 0 0 3px #176d5d1b}
+    .hint{font-size:12px;color:var(--muted);margin:9px 0 0}
+    .score-area{display:grid;grid-template-columns:100px 1fr;gap:15px;align-items:center}.donut{height:96px;width:96px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--accent) 0deg,var(--line) 0deg);position:relative}
+    .donut:after{content:"";background:#fff;position:absolute;inset:10px;border-radius:50%}.score-num{position:relative;z-index:1;font-weight:800;font-size:26px}.score-num small{font-size:11px;color:var(--muted);font-weight:600}
+    .status{font-size:17px;font-weight:750;margin-bottom:3px}.muted{color:var(--muted)}.small{font-size:12px}.score-meta{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}.tag{font-size:12px;padding:4px 8px;background:#eef2ef;border-radius:30px;color:#526660}.tag.bad{color:var(--bad);background:var(--bad-bg)}.tag.good{color:#176454;background:var(--accent-soft)}
+    .buttonbar{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 4px}.btn{border:1px solid var(--line);background:#fff;padding:10px 14px;border-radius:11px;font-weight:690;color:var(--ink);min-height:43px}.btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}.btn.soft{background:var(--accent-soft);color:#145747;border-color:#cde9dc}.btn.danger{color:#a33b3b}.btn:hover{filter:brightness(.97)}.btn:active{transform:translateY(1px)}
+    .section-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:22px 0 11px}.counter{font-size:12px;color:var(--muted)}
+    .criterion{background:#fff;border:1px solid var(--line);border-radius:15px;margin:0 0 10px;overflow:hidden}.criterion[open]{border-color:#b9d1c4;box-shadow:0 5px 16px #0d34250a}
+    .criterion summary{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:59px;padding:12px 14px;cursor:pointer;list-style:none}.criterion summary::-webkit-details-marker{display:none}
+    .summary-name{font-weight:760;font-size:15px}.summary-weight{color:var(--muted);font-size:12px;margin-left:7px;white-space:nowrap}.head-right{display:flex;align-items:center;gap:8px}
+    .rating-chip{white-space:nowrap;font-size:11px;padding:5px 9px;border-radius:30px;background:#eef1ef;color:var(--muted);font-weight:760}.rating-chip.good{background:#e3f1e8;color:#126047}.rating-chip.ideal{background:#d7f0df;color:#095b40}.rating-chip.minimum{background:#fff1d9;color:#865a1b}.rating-chip.fail{background:#fae3e0;color:#a63e37}
+    .chevron{color:var(--muted);transition:transform .16s}.criterion[open] .chevron{transform:rotate(180deg)}
+    .criterion-body{padding:0 14px 15px;border-top:1px solid #edf1ee}
+    .levels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:13px}.level{background:#f7f9f7;padding:12px;border:1px solid #e8efeb;border-radius:12px}.level b{font-size:12px}.level.min b{color:#966a24}.level.good b{color:#17725d}.level.ideal b{color:#2d558a}.level ul{padding:0 0 0 17px;margin:7px 0 0;font-size:12px;color:#50635d;line-height:1.45}.level li+li{margin-top:5px}
+    .rate-label{font-size:12px;font-weight:730;margin:15px 0 8px}.ratings{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}.rate{min-height:40px;border:1px solid #dbe4dd;border-radius:9px;background:#fff;padding:7px 4px;font-size:12px;font-weight:670;white-space:normal;color:#455852}.rate.active{background:#195f51;color:white;border-color:#195f51}.rate[data-value="fail"].active{background:#aa4540;border-color:#aa4540}.rate[data-value="none"].active{background:#e5ebe7;color:#455852;border-color:#b9c9bf}
+    .note-label{margin:11px 0 6px}.note{min-height:40px;height:58px;resize:vertical;font-size:13px}.safety-items{display:grid;grid-template-columns:1fr 1fr;gap:9px}.safety-row{padding:11px;border:1px solid var(--line);border-radius:11px;display:flex;flex-direction:column;gap:9px}.safety-name{font-size:13px;font-weight:680}.safety-options{display:flex;gap:5px;flex-wrap:wrap}.safety-options button{padding:6px 10px;border-radius:7px;background:#f2f5f2;border:1px solid #e0e7e2;font-size:12px}.safety-options button.active{border-color:var(--accent);background:var(--accent-soft);color:#135747;font-weight:800}.safety-options button.no.active{border-color:#db9c9c;background:#fde9e6;color:#ad4545}
+    .saved-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:9px}.saved{border:1px solid var(--line);border-radius:13px;padding:13px;background:#fff}.saved-title{font-weight:780;font-size:16px;overflow-wrap:anywhere}.saved-info{font-size:12px;color:var(--muted);margin:5px 0 9px}.saved-score{font-weight:800;font-size:21px;color:var(--accent)}.saved-actions{display:flex;gap:5px;flex-wrap:wrap;margin-top:11px}.saved-actions .btn{min-height:34px;padding:7px 10px;font-size:12px}
+    .comparison{overflow-x:auto;border:1px solid var(--line);border-radius:11px}.compare{width:100%;border-collapse:collapse;font-size:12px;min-width:530px}.compare th,.compare td{padding:9px 10px;text-align:left;border-bottom:1px solid #edf0ed;vertical-align:top}.compare thead th{background:#eff6f1;position:sticky;top:0}.compare tbody tr:last-child td{border-bottom:0}.compare td:first-child{font-weight:650;min-width:130px}.compare tr:nth-child(even){background:#f9fbf9}
+    .notice{background:#f0f6f2;padding:11px 13px;border-radius:10px;font-size:12px;color:#35564b}.empty{background:#f8faf8;border:1px dashed #cddcd1;padding:17px;border-radius:12px;color:var(--muted);font-size:13px;text-align:center}.foot{color:var(--muted);font-size:12px;margin:20px 0}
+    .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:25px;max-width:calc(100vw - 28px);color:white;background:#1e4a3f;padding:11px 16px;border-radius:10px;box-shadow:0 8px 30px #0004;z-index:30;font-size:13px;display:none;text-align:center}.toast.visible{display:block}
+    @media(max-width:760px){.field-grid{grid-template-columns:1fr 1fr}.field-grid .first{grid-column:1/-1}.levels{grid-template-columns:1fr}.level ul{display:grid;grid-template-columns:1fr 1fr;gap:4px 15px}.level li+li{margin-top:0}.safety-items{grid-template-columns:1fr}.wrap{padding-left:12px;padding-right:12px}.hero{padding-top:22px}.panel{padding:13px}.summary-weight{display:none}}
+    @media(max-width:430px){.level ul{display:block}.level li+li{margin-top:5px}.ratings{grid-template-columns:repeat(3,1fr)}.buttonbar .btn{flex-grow:1}.score-area{grid-template-columns:79px 1fr}.donut{height:77px;width:77px}.donut:after{inset:8px}.score-num{font-size:21px}.saved-list{grid-template-columns:1fr}.criterion summary{padding:11px}.summary-name{font-size:14px}.rating-chip{font-size:10px}}
+    @media print{.hero{background:#fff;color:#000}.hero p,.eyebrow{color:#333}.buttonbar,.saved-actions,.note-label,.note,.ratings,.rate-label,.chevron{display:none!important}.criterion{break-inside:avoid}.criterion-body{display:block}.wrap{max-width:none}body{background:#fff}}
+  </style>
+</head>
+<body>
+  <header class="hero"><div class="wrap">
+    <div class="eyebrow">Ваш помощник в магазине</div>
+    <h1>Выбираем коляску</h1>
+    <p>Оцени каждую модель по вашим требованиям. Сохраняй варианты, добавляй новые и сравнивай результаты на одной странице.</p>
+    <div class="chips"><span class="chip">2 в 1</span><span class="chip">60–80 тыс. ₽</span><span class="chip">Санкт-Петербург · всесезонная</span><span class="chip">165 / 187 см</span></div>
+  </div></header>
+  <main class="wrap">
+<div id="scriptWarning" class="panel" role="alert" style="border-color:#ddad5d;background:#fff9ec;color:#714b1d">
+<strong>Предпросмотр без интерактивности.</strong> Здесь можно читать все 15 критериев, но в этом просмотрщике JavaScript не выполняется, поэтому кнопки оценки и сохранение не работают. Для заполнения открой этот HTML-файл в обычном браузере с включённым JavaScript, а не во встроенном просмотре ChatGPT или «Файлов».
+</div>
+    <section class="panel" id="editorTop">
+      <div class="section-head" style="margin:0 0 11px"><h2 id="editorTitle" style="margin:0">Новая коляска</h2><span class="tag" id="draftTag">Черновик сохраняется</span></div>
+      <div class="field-grid">
+        <div class="field first"><label for="modelName">Модель и версия *</label><input id="modelName" placeholder="Например, Tutis Uno 6+" autocomplete="off" maxlength="110"></div>
+        <div class="field"><label for="price">Цена, ₽</label><input id="price" type="number" min="0" max="2000000" inputmode="numeric" placeholder="75000"></div>
+        <div class="field"><label for="condition">Состояние</label><select id="condition"><option value="Новая">Новая</option><option value="Б/у">Б/у</option></select></div>
+      </div>
+      <p class="hint">Отмечай уровень целиком по описанию в блоке. «Не проверено» не снижает оценку, но влияет на полноту. «Ниже минимума» отмечает конкретный недостаток. К каждому разделу можно добавить размеры и личные впечатления.</p>
+      <div class="buttonbar"><button class="btn primary" id="saveNext">Сохранить и добавить другую</button><button class="btn soft" id="saveCurrent">Сохранить</button><button class="btn" id="newBtn">Новая пустая</button><button class="btn danger" id="resetBtn">Сбросить отметки</button></div>
+    </section>
+
+    <section class="panel" aria-live="polite">
+      <div class="score-area"><div class="donut" id="donut"><span class="score-num" id="scoreValue">—</span></div>
+      <div><div class="status" id="scoreStatus">Пока нет оценки</div><div class="small muted" id="scoreHelp">Отметь характеристики модели</div><div class="score-meta" id="scoreMeta"></div></div></div>
+    </section>
+
+    <section class="panel" id="safetyPanel">
+      <h2>Проверка безопасности</h2><p class="hint" style="margin-top:-4px;margin-bottom:13px">Эти пункты не превращаются в «баллы». Если какой-то критический пункт не пройден, коляску покупать не рекомендуем независимо от итогового процента.</p>
+      <div class="safety-items" id="safetyItems">
+<div class="safety-row"><div class="safety-name">Тормоз удерживает коляску</div><div class="safety-options"><button type="button" data-safety="brake" data-value="none">Не проверено</button><button type="button" data-safety="brake" data-value="yes">Да</button><button type="button" data-safety="brake" data-value="no">Нет</button></div></div>
+<div class="safety-row"><div class="safety-name">Шасси и оба блока надёжно фиксируются</div><div class="safety-options"><button type="button" data-safety="locks" data-value="none">Не проверено</button><button type="button" data-safety="locks" data-value="yes">Да</button><button type="button" data-safety="locks" data-value="no">Нет</button></div></div>
+<div class="safety-row"><div class="safety-name">Пятиточечные ремни работают и регулируются</div><div class="safety-options"><button type="button" data-safety="harness" data-value="none">Не проверено</button><button type="button" data-safety="harness" data-value="yes">Да</button><button type="button" data-safety="harness" data-value="no">Нет</button></div></div>
+<div class="safety-row"><div class="safety-name">В люльке ровная твёрдая поверхность</div><div class="safety-options"><button type="button" data-safety="cotflat" data-value="none">Не проверено</button><button type="button" data-safety="cotflat" data-value="yes">Да</button><button type="button" data-safety="cotflat" data-value="no">Нет</button></div></div>
+<div class="safety-row"><div class="safety-name">Документы и ограничения производителя проверены</div><div class="safety-options"><button type="button" data-safety="cert" data-value="none">Не проверено</button><button type="button" data-safety="cert" data-value="yes">Да</button><button type="button" data-safety="cert" data-value="no">Нет</button></div></div>
+</div>
+    </section>
+
+    <section>
+      <div class="section-head"><h2>15 характеристик</h2><span class="counter" id="sectionsDone">0 из 15 оценено</span></div>
+      <div id="criteria">
+<details class="criterion" id="sec-wheels" open>
+  <summary><div><span class="summary-name">1. Колёса</span><span class="summary-weight">Вес 13%</span></div><span class="head-right"><span id="chip-wheels"><span class="rating-chip">Не проверено</span></span><span class="chevron">⌄</span></span></summary>
+  <div class="criterion-body"><div class="levels"><div class="level min"><b>Минимум</b><ul><li>Передние от 19 см, задние от 27 см</li><li>Резина, PU, качественные непрокалываемые или надувные шины</li><li>Передние поворотные, фиксируются прямо</li></ul></div><div class="level good"><b>Хорошо</b><ul><li>Передние 20–22 см, задние 29–30 см</li><li>Износостойкие шины, хорошее сцепление и протектор</li></ul></div><div class="level ideal"><b>Идеально</b><ul><li>Передние 22–25 см, задние 30–33 см</li><li>Качественное покрытие, уверенное сцепление</li><li>Быстросъёмные колёса</li></ul></div></div>
+   <div class="rate-label">Какой уровень соответствует этой коляске?</div><div class="ratings"><button type="button" class="rate" data-criterion="wheels" data-value="none" aria-pressed="false">Не проверено</button><button type="button" class="rate" data-criterion="wheels" data-value="fail" aria-pressed="false">Ниже минимума</button><button type="button" class="rate" data-criterion="wheels" data-value="min" aria-pressed="false">Минимум</button><button type="button" class="rate" data-criterion="wheels" data-value="good" aria-pressed="false">Хорошо</button><button type="button" class="rate" data-criterion="wheels" data-value="ideal" aria-pressed="false">Идеально</button></div>
+   <label class="note-label" for="note-wheels">Замеры, особенности и впечатления (необязательно)</label>
+   <textarea class="note" id="note-wheels" data-note="wheels" placeholder="Например: передние 22 см, задние 30 см; плавный ход"></textarea>
+  </div>
+ </details>
+<details class="criterion" id="sec-suspension" >
+  <summary><div><span class="summary-name">2. Амортизация</span><span class="summary-weight">Вес 15%</span></div><span class="head-right"><span id="chip-suspension"><span class="rating-chip">Не проверено</span></span><span class="chevron">⌄</span></span></summary>
+  <div class="criterion-body"><div class="levels"><div class="level min"><b>Минимум</b><ul><li>На передней и задней части: пружины, эластомеры или их комбинация</li><li>Допустима схема с амортизацией рамы вместо отдельного заднего амортизатора</li></ul></div><div class="level good"><b>Хорошо</b><ul><li>Независимая работа передней и задней подвески</li><li>Мягкий ход по плитке и неровному асфальту</li></ul></div><div class="level ideal"><b>Идеально</b><ul><li>Отличное гашение ударов без сильной раскачки</li><li>Дополнительная амортизация рамы</li><li>Регулировка жёсткости — плюс, но не обязательна</li></ul></div></div>
+   <div class="rate-label">Какой уровень соответствует этой коляске?</div><div class="ratings"><button type="button" class="rate" data-criterion="suspension" data-value="none" aria-pressed="false">Не проверено</button><button type="button" class="rate" data-criterion="suspension" data-value="fail" aria-pressed="false">Ниже минимума</button><button type="button" class="rate" data-criterion="suspension" data-value="min" aria-pressed="false">Минимум</button><button type="button" class="rate" data-criterion="suspension" data-value="good" aria-pressed="false">Хорошо</button><button type="button" class="rate" data-criterion="suspension" data-value="ideal" aria-pressed="false">Идеально</button></div>
+   <label class="note-label" for="note-suspension">Замеры, особенности и впечатления (необязательно)</label>
+   <textarea class="note" id="note-suspension" data-note="suspension" placeholder="Например: передние 22 см, задние 30 см; плавный ход"></textarea>
+  </div>
+ </details>
+<details class="criterion" id="sec-size" >
+  <summary><div><span class="summary-name">3. Вес и ширина</span><span class="summary-weight">Вес 9%</span></div><span class="head-right"><span id="chip-size"><span class="rating-chip">Не проверено</span></span><span class="chevron">⌄</span></span></summary>
+  <div class="criterion-body"><div class="levels"><div class="level min"><b>Минимум</b><ul><li>Вес с люлькой до 14 кг</li><li>Ширина шасси до 63 см; реально проходит в лифт</li></ul></div><div class="level good"><b>Хорошо</b><ul><li>Вес с люлькой до 12,5–13 кг</li><li>Ширина шасси 58–61 см</li></ul></div><div class="level ideal"><b>Идеально</b><ul><li>Вес с люлькой до 11,5–12 кг</li><li>Ширина 58–60 см без потери устойчивости</li></ul></div></div>
+   <div class="rate-label">Какой уровень соответствует этой коляске?</div><div class="ratings"><button type="button" class="rate" data-criterion="size" data-value="none" aria-pressed="false">Не проверено</button><button type="button" class="rate" data-criterion="size" data-value="fail" aria-pressed="false">Ниже минимума</button><button type="button" class="rate" data-criterion="size" data-value="min" aria-pressed="false">Минимум</button><button type="button" class="rate" data-criterion="size" data-value="good" aria-pressed="false">Хорошо</button><button type="button" class="rate" data-criterion="size" data-value="ideal" aria-pressed="false">Идеально</button></div>
+   <label class="note-label" for="note-size">Замеры, особенности и впечатления (необязательно)</label>
+   <textarea class="note" id="note-size" data-note="size" placeholder="Например: передние 22 см, задние 30 см; плавный ход"></textarea>
+  </div>
+ </details>
+<details class="criterion" id="sec-cot" >
+  <summary><div><span class="summary-name">4. Люлька</span><span class="summary-weight">Вес 8%</span></div><span class="head-right"><span id="chip-cot"><span class="rating-chip">Не проверено</span></span><span class="chevron">⌄</span></span></summary>
+  <div class="criterion-body"><div class="levels"><div class="level min"><b>Минимум</b><ul><li>Внутренние размеры от 75×33 см</li><li>Ровное жёсткое основание и штатный твёрдый матрас</li><li>Люлька снимается с шасси</li></ul></div><div class="level good"><b>Хорошо</b><ul><li>От 78×35 см, вес люльки до 4,5 кг</li><li>Удобное снятие и защита от ветра</li></ul></div><div class="level ideal"><b>Идеально</b><ul><li>От 80×36 см, вес до 4 кг</li><li>Снятие одной рукой; складная конструкция</li><li>Регулировка высоты установки — плюс</li></ul></div></div>
+   <div class="rate-label">Какой уровень соответствует этой коляске?</div><div class="ratings"><button type="button" class="rate" data-criterion="cot" data-value="none" aria-pressed="false">Не проверено</button><button type="button" class="rate" data-criterion="cot" data-value="fail" aria-pressed="false">Ниже минимума</button><button type="button" class="rate" data-criterion="cot" data-value="min" aria-pressed="false">Минимум</button><button type="button" class="rate" data-criterion="cot" data-value="good" aria-pressed="false">Хорошо</button><button type="button" class="rate" data-criterion="cot" data-value="ideal" aria-pressed="false">Идеально</button></div>
+   <label class="note-label" for="note-cot">Замеры, особенности и впечатления (необязательно)</label>
+   <textarea class="note" id="note-cot" data-note="cot" placeholder="Например: передние 22 см, задние 30 см; плавный ход"></textarea>
+  </div>
+ </details>
+<details class="criterion" id="sec-cotvent" >
+  <summary><div><span class="summary-name">5. Вентиляция люльки</span><span class="summary-weight">Вес 8%</span></div><span class="head-right"><span id="chip-cotvent"><span class="rating-chip">Не проверено</span></span><span class="chevron">⌄</span></span></summary>
+  <div class="criterion-body"><div class="levels"><div class="level min"><b>Минимум</b><ul><li>Две открываемые зоны: капюшон и изголовье</li><li>Сетчатые панели закрываются от ветра и холода</li></ul></div><div class="level good"><b>Хорошо</b><ul><li>Большие панели в капюшоне и изголовье</li><li>Возможность сквозного проветривания</li></ul></div><div class="level ideal"><b>Идеально</b><ul><li>Большие регулируемые панели с удобным доступом</li><li>Дополнительно вентилируемое основание люльки</li></ul></div></div>
+   <div class="rate-label">Какой уровень соответствует этой коляске?</div><div class="ratings"><button type="button" class="rate" data-criterion="cotvent" data-value="none" aria-pressed="false">Не проверено</button><button type="button" class="rate" data-criterion="cotvent" data-value="fail" aria-pressed="false">Ниже минимума</button><button type="button" class="rate" data-criterion="cotvent" data-value="min" aria-pressed="false">Минимум</button><button type="button" class="rate" data-criterion="cotvent" data-value="good" aria-pressed="false">Хорошо</button><button type="button" class="rate" data-criterion="cotvent" data-value="ideal" aria-pressed="false">Идеально</button></div>
+   <label class="note-label" for="note-cotvent">Замеры, особенности и впечатления (необязательно)</label>
+   <textarea class="note" id="note-cotvent" data-note="cotvent" placeholder="Например: передние 22 см, задние 30 см; плавный ход"></textarea>
+  </div>
+ </details>
+<details class="criterion" id="sec-seat" >
+  <summary><div><span class="summary-name">6. Прогулочный блок</span><span class="summary-weight">Вес 10%</span></div><span class="head-right"><span id="chip-seat"><span class="rating-chip">Не проверено</span></span><span class="chevron">⌄</span></span></summary>
+  <div class="criterion-body"><div class="levels"><div class="level min"><b>Минимум</b><ul><li>Реверсивный: лицом к родителям и вперёд</li><li>Регулируемые спинка и подножка</li><li>Защитный капюшон</li></ul></div><div class="level good"><b>Хорошо</b><ul><li>Допустимая масса ребёнка до 22 кг</li><li>Ширина сиденья от 34 см</li><li>Длина поверхности для отдыха от 95 см</li></ul></div><div class="level ideal"><b>Идеально</b><ul><li>Ширина от 36 см, отдых от 100 см</li><li>Регулировка высоты капюшона</li><li>Удобная регулировка спинки одной рукой</li></ul></div></div>
+   <div class="rate-label">Какой уровень соответствует этой коляске?</div><div class="ratings"><button type="button" class="rate" data-criterion="seat" data-value="none" aria-pressed="false">Не проверено</button><button type="button" class="rate" data-criterion="seat" data-value="fail" aria-pressed="false">Ниже минимума</button><button type="button" class="rate" data-criterion="seat" data-value="min" aria-pressed="false">Минимум</button><button type="button" class="rate" data-criterion="seat" data-value="good" aria-pressed="false">Хорошо</button><button type="button" class="rate" data-criterion="seat" data-value="ideal" aria-pressed="false">Идеально</button></div>
+   <label class="note-label" for="note-seat">Замеры, особенности и впечатления (необязательно)</label>
+   <textarea class="note" id="note-seat" data-note="seat" placeholder="Например: передние 22 см, задние 30 см; плавный ход"></textarea>
+  </div>
+ </details>
+<details class="criterion" id="sec-seatvent" >
+  <summary><div><span class="summary-name">7. Вентиляция прогулочного блока</span><span class="summary-weight">Вес 6%</span></div><span class="head-right"><span id="chip-seatvent"><span class="rating-chip">Не проверено</span></span><span class="chevron">⌄</span></span></summary>
+  <div class="criterion-body"><div class="levels"><div class="level min"><b>Минимум</b><ul><li>Открываемая сетчатая секция в капюшоне</li><li>Воздухопроницаемая конструкция спинки</li></ul></div><div class="level good"><b>Хорошо</b><ul><li>Отдельные зоны в капюшоне и спинке</li><li>Открываемая сетчатая панель в спинке</li></ul></div><div class="level ideal"><b>Идеально</b><ul><li>Большие вентиляционные окна</li><li>Дышащая ткань сиденья</li><li>Вентиляция подножки — дополнительный плюс</li></ul></div></div>
+   <div class="rate-label">Какой уровень соответствует этой коляске?</div><div class="ratings"><button type="button" class="rate" data-criterion="seatvent" data-value="none" aria-pressed="false">Не проверено</button><button type="button" class="rate" data-criterion="seatvent" data-value="fail" aria-pressed="false">Ниже минимума</button><button type="button" class="rate" data-criterion="seatvent" data-value="min" aria-pressed="false">Минимум</button><button type="button" class="rate" data-criterion="seatvent" data-value="good" aria-pressed="false">Хорошо</button><button type="button" class="rate" data-criterion="seatvent" data-value="ideal" aria-pressed="false">Идеально</button></div>
+   <label class="note-label" for="note-seatvent">Замеры, особенности и впечатления (необязательно)</label>
+   <textarea class="note" id="note-seatvent" data-note="seatvent" placeholder="Например: передние 22 см, задние 30 см; плавный ход"></textarea>
+  </div>
+ </details>
+<details class="criterion" id="sec-belts" >
+  <summary><div><span class="summary-name">8. Ремни и фиксация</span><span class="summary-weight">Вес 4%</span></div><span class="head-right"><span id="chip-belts"><span class="rating-chip">Не проверено</span></span><span class="chevron">⌄</span></span></summary>
+  <div class="criterion-body"><div class="levels"><div class="level min"><b>Минимум</b><ul><li>Пятиточечные ремни</li><li>Регулировка плечевых лямок по высоте и длине</li><li>Надёжная застёжка</li></ul></div><div class="level good"><b>Хорошо</b><ul><li>Мягкие накладки</li><li>Быстрая и удобная регулировка и фиксация</li></ul></div><div class="level ideal"><b>Идеально</b><ul><li>Магнитная застёжка — плюс</li><li>Натяжение одним движением</li><li>Перестановка по росту без сложной разборки</li></ul></div></div>
+   <div class="rate-label">Какой уровень соответствует этой коляске?</div><div class="ratings"><button type="button" class="rate" data-criterion="belts" data-value="none" aria-pressed="false">Не проверено</button><button type="button" class="rate" data-criterion="belts" data-value="fail" aria-pressed="false">Ниже минимума</button><button type="button" class="rate" data-criterion="belts" data-value="min" aria-pressed="false">Минимум</button><button type="button" class="rate" data-criterion="belts" data-value="good" aria-pressed="false">Хорошо</button><button type="button" class="rate" data-criterion="belts" data-value="ideal" aria-pressed="false">Идеально</button></div>
+   <label class="note-label" for="note-belts">Замеры, особенности и впечатления (необязательно)</label>
+   <textarea class="note" id="note-belts" data-note="belts" placeholder="Например: передние 22 см, задние 30 см; плавный ход"></textarea>
+  </div>
+ </details>
+<details class="criterion" id="sec-handle" >
+  <summary><div><span class="summary-name">9. Ручка родителей</span><span class="summary-weight">Вес 5%</span></div><span class="head-right"><span id="chip-handle"><span class="rating-chip">Не проверено</span></span><span class="chevron">⌄</span></span></summary>
+  <div class="criterion-body"><div class="levels"><div class="level min"><b>Минимум</b><ul><li>Подходит для 165 см и 187 см</li><li>Ноги не задевают заднюю ось при широком шаге</li></ul></div><div class="level good"><b>Хорошо</b><ul><li>Ориентир диапазона 92–110 см</li><li>Удобная регулировка и покрытие</li></ul></div><div class="level ideal"><b>Идеально</b><ul><li>Ориентир диапазона 90–112 см</li><li>Простая регулировка одной рукой</li><li>Обоим удобно вести одной рукой</li></ul></div></div>
+   <div class="rate-label">Какой уровень соответствует этой коляске?</div><div class="ratings"><button type="button" class="rate" data-criterion="handle" data-value="none" aria-pressed="false">Не проверено</button><button type="button" class="rate" data-criterion="handle" data-value="fail" aria-pressed="false">Ниже минимума</button><button type="button" class="rate" data-criterion="handle" data-value="min" aria-pressed="false">Минимум</button><button type="button" class="rate" data-criterion="handle" data-value="good" aria-pressed="false">Хорошо</button><button type="button" class="rate" data-criterion="handle" data-value="ideal" aria-pressed="false">Идеально</button></div>
+   <label class="note-label" for="note-handle">Замеры, особенности и впечатления (необязательно)</label>
+   <textarea class="note" id="note-handle" data-note="handle" placeholder="Например: передние 22 см, задние 30 см; плавный ход"></textarea>
+  </div>
+ </details>
+<details class="criterion" id="sec-fold" >
+  <summary><div><span class="summary-name">10. Складывание и машина</span><span class="summary-weight">Вес 7%</span></div><span class="head-right"><span id="chip-fold"><span class="rating-chip">Не проверено</span></span><span class="chevron">⌄</span></span></summary>
+  <div class="criterion-body"><div class="levels"><div class="level min"><b>Минимум</b><ul><li>Света самостоятельно складывает и поднимает шасси</li><li>Помещается в багажник Changan CS75 Plus</li></ul></div><div class="level good"><b>Хорошо</b><ul><li>Можно складывать вместе с прогулочным блоком</li><li>Компактность: ориентир до 85×62×40 см</li></ul></div><div class="level ideal"><b>Идеально</b><ul><li>Складывание одной рукой</li><li>Стоит и фиксируется в сложенном виде</li><li>Люлька тоже компактно складывается</li></ul></div></div>
+   <div class="rate-label">Какой уровень соответствует этой коляске?</div><div class="ratings"><button type="button" class="rate" data-criterion="fold" data-value="none" aria-pressed="false">Не проверено</button><button type="button" class="rate" data-criterion="fold" data-value="fail" aria-pressed="false">Ниже минимума</button><button type="button" class="rate" data-criterion="fold" data-value="min" aria-pressed="false">Минимум</button><button type="button" class="rate" data-criterion="fold" data-value="good" aria-pressed="false">Хорошо</button><button type="button" class="rate" data-criterion="fold" data-value="ideal" aria-pressed="false">Идеально</button></div>
+   <label class="note-label" for="note-fold">Замеры, особенности и впечатления (необязательно)</label>
+   <textarea class="note" id="note-fold" data-note="fold" placeholder="Например: передние 22 см, задние 30 см; плавный ход"></textarea>
+  </div>
+ </details>
+<details class="criterion" id="sec-fabrics" >
+  <summary><div><span class="summary-name">11. Ткани и защита от погоды</span><span class="summary-weight">Вес 3%</span></div><span class="head-right"><span id="chip-fabrics"><span class="rating-chip">Не проверено</span></span><span class="chevron">⌄</span></span></summary>
+  <div class="criterion-body"><div class="levels"><div class="level min"><b>Минимум</b><ul><li>Водоотталкивающая ткань и защита от ветра</li><li>Глубокий капюшон; ткань очищается</li></ul></div><div class="level good"><b>Хорошо</b><ul><li>Защита капюшона UPF 50+</li><li>Съёмные стираемые внутренние ткани</li></ul></div><div class="level ideal"><b>Идеально</b><ul><li>Качественная стойкая ткань и швы</li><li>Удобное снятие обивки, хорошие молнии</li><li>Долговременное сохранение внешнего вида</li></ul></div></div>
+   <div class="rate-label">Какой уровень соответствует этой коляске?</div><div class="ratings"><button type="button" class="rate" data-criterion="fabrics" data-value="none" aria-pressed="false">Не проверено</button><button type="button" class="rate" data-criterion="fabrics" data-value="fail" aria-pressed="false">Ниже минимума</button><button type="button" class="rate" data-criterion="fabrics" data-value="min" aria-pressed="false">Минимум</button><button type="button" class="rate" data-criterion="fabrics" data-value="good" aria-pressed="false">Хорошо</button><button type="button" class="rate" data-criterion="fabrics" data-value="ideal" aria-pressed="false">Идеально</button></div>
+   <label class="note-label" for="note-fabrics">Замеры, особенности и впечатления (необязательно)</label>
+   <textarea class="note" id="note-fabrics" data-note="fabrics" placeholder="Например: передние 22 см, задние 30 см; плавный ход"></textarea>
+  </div>
+ </details>
+<details class="criterion" id="sec-basket" >
+  <summary><div><span class="summary-name">12. Корзина</span><span class="summary-weight">Вес 2%</span></div><span class="head-right"><span id="chip-basket"><span class="rating-chip">Не проверено</span></span><span class="chevron">⌄</span></span></summary>
+  <div class="criterion-body"><div class="levels"><div class="level min"><b>Минимум</b><ul><li>Корзина есть, доступ удобный и крепления надёжные</li></ul></div><div class="level good"><b>Хорошо</b><ul><li>Допустимая нагрузка от 5 кг</li><li>Доступ с разных сторон</li></ul></div><div class="level ideal"><b>Идеально</b><ul><li>Нагрузка от 8–10 кг</li><li>Вместительная, есть защита от грязи</li></ul></div></div>
+   <div class="rate-label">Какой уровень соответствует этой коляске?</div><div class="ratings"><button type="button" class="rate" data-criterion="basket" data-value="none" aria-pressed="false">Не проверено</button><button type="button" class="rate" data-criterion="basket" data-value="fail" aria-pressed="false">Ниже минимума</button><button type="button" class="rate" data-criterion="basket" data-value="min" aria-pressed="false">Минимум</button><button type="button" class="rate" data-criterion="basket" data-value="good" aria-pressed="false">Хорошо</button><button type="button" class="rate" data-criterion="basket" data-value="ideal" aria-pressed="false">Идеально</button></div>
+   <label class="note-label" for="note-basket">Замеры, особенности и впечатления (необязательно)</label>
+   <textarea class="note" id="note-basket" data-note="basket" placeholder="Например: передние 22 см, задние 30 см; плавный ход"></textarea>
+  </div>
+ </details>
+<details class="criterion" id="sec-extras" >
+  <summary><div><span class="summary-name">13. Комплектация</span><span class="summary-weight">Вес 2%</span></div><span class="head-right"><span id="chip-extras"><span class="rating-chip">Не проверено</span></span><span class="chevron">⌄</span></span></summary>
+  <div class="criterion-body"><div class="levels"><div class="level min"><b>Минимум</b><ul><li>Дождевик, москитка и накидка на люльку входят в бюджет покупки</li></ul></div><div class="level good"><b>Хорошо</b><ul><li>Также накидка на ноги прогулочного блока</li><li>Сумка или рюкзак для родителей</li></ul></div><div class="level ideal"><b>Идеально</b><ul><li>Нужные зимние аксессуары</li><li>Всё нужное без выхода за бюджет 80 тыс. ₽</li></ul></div></div>
+   <div class="rate-label">Какой уровень соответствует этой коляске?</div><div class="ratings"><button type="button" class="rate" data-criterion="extras" data-value="none" aria-pressed="false">Не проверено</button><button type="button" class="rate" data-criterion="extras" data-value="fail" aria-pressed="false">Ниже минимума</button><button type="button" class="rate" data-criterion="extras" data-value="min" aria-pressed="false">Минимум</button><button type="button" class="rate" data-criterion="extras" data-value="good" aria-pressed="false">Хорошо</button><button type="button" class="rate" data-criterion="extras" data-value="ideal" aria-pressed="false">Идеально</button></div>
+   <label class="note-label" for="note-extras">Замеры, особенности и впечатления (необязательно)</label>
+   <textarea class="note" id="note-extras" data-note="extras" placeholder="Например: передние 22 см, задние 30 см; плавный ход"></textarea>
+  </div>
+ </details>
+<details class="criterion" id="sec-quality" >
+  <summary><div><span class="summary-name">14. Качество и долговечность</span><span class="summary-weight">Вес 3%</span></div><span class="head-right"><span id="chip-quality"><span class="rating-chip">Не проверено</span></span><span class="chevron">⌄</span></span></summary>
+  <div class="criterion-body"><div class="levels"><div class="level min"><b>Минимум</b><ul><li>Надёжные крепления и тормоза</li><li>Нет опасных люфтов и дефектов</li><li>Доступны ремонт или запасные детали</li></ul></div><div class="level good"><b>Хорошо</b><ul><li>Качественные подшипники и механизмы</li><li>Запчасти и сервис реально доступны</li></ul></div><div class="level ideal"><b>Идеально</b><ul><li>Высокое качество сборки</li><li>Долговечная рама и подвеска</li><li>Хорошая поддержка производителя</li></ul></div></div>
+   <div class="rate-label">Какой уровень соответствует этой коляске?</div><div class="ratings"><button type="button" class="rate" data-criterion="quality" data-value="none" aria-pressed="false">Не проверено</button><button type="button" class="rate" data-criterion="quality" data-value="fail" aria-pressed="false">Ниже минимума</button><button type="button" class="rate" data-criterion="quality" data-value="min" aria-pressed="false">Минимум</button><button type="button" class="rate" data-criterion="quality" data-value="good" aria-pressed="false">Хорошо</button><button type="button" class="rate" data-criterion="quality" data-value="ideal" aria-pressed="false">Идеально</button></div>
+   <label class="note-label" for="note-quality">Замеры, особенности и впечатления (необязательно)</label>
+   <textarea class="note" id="note-quality" data-note="quality" placeholder="Например: передние 22 см, задние 30 см; плавный ход"></textarea>
+  </div>
+ </details>
+<details class="criterion" id="sec-look" >
+  <summary><div><span class="summary-name">15. Внешний вид</span><span class="summary-weight">Вес 5%</span></div><span class="head-right"><span id="chip-look"><span class="rating-chip">Не проверено</span></span><span class="chevron">⌄</span></span></summary>
+  <div class="criterion-body"><div class="levels"><div class="level min"><b>Минимум</b><ul><li>Внешний вид устраивает обоих</li></ul></div><div class="level good"><b>Хорошо</b><ul><li>Современный дизайн и приятные материалы</li><li>Свете нравится расцветка и отделка</li></ul></div><div class="level ideal"><b>Идеально</b><ul><li>Дизайн очень нравится Свете</li><li>Премиальные детали и качество отделки</li></ul></div></div>
+   <div class="rate-label">Какой уровень соответствует этой коляске?</div><div class="ratings"><button type="button" class="rate" data-criterion="look" data-value="none" aria-pressed="false">Не проверено</button><button type="button" class="rate" data-criterion="look" data-value="fail" aria-pressed="false">Ниже минимума</button><button type="button" class="rate" data-criterion="look" data-value="min" aria-pressed="false">Минимум</button><button type="button" class="rate" data-criterion="look" data-value="good" aria-pressed="false">Хорошо</button><button type="button" class="rate" data-criterion="look" data-value="ideal" aria-pressed="false">Идеально</button></div>
+   <label class="note-label" for="note-look">Замеры, особенности и впечатления (необязательно)</label>
+   <textarea class="note" id="note-look" data-note="look" placeholder="Например: передние 22 см, задние 30 см; плавный ход"></textarea>
+  </div>
+ </details>
+</div>
+      <div class="buttonbar"><button class="btn primary" id="saveNextBottom">Сохранить и добавить другую</button><button class="btn" id="scrollTop">К началу анкеты ↑</button></div>
+    </section>
+
+    <section class="panel" id="savedSection" style="margin-top:20px">
+      <div class="section-head" style="margin:0 0 8px"><h2>Сохранённые коляски <span id="savedCount" class="muted"></span></h2></div>
+      <div id="savedList" class="saved-list"></div>
+      <div class="buttonbar"><button class="btn soft" id="exportBtn">Скачать резервную копию JSON</button><button class="btn" id="importBtn">Загрузить резервную копию</button><input hidden type="file" id="importFile" accept=".json,application/json"></div>
+      <p class="hint">Данные автоматически сохраняются в браузере на этом устройстве. Для надёжности после осмотра нескольких моделей скачай резервную копию: хранение в браузере может быть очищено приложением или системой.</p>
+    </section>
+
+    <section class="panel" id="comparisonSection"><h2>Сравнение моделей</h2><div id="comparison" class="empty">Сохрани хотя бы две коляски, чтобы увидеть сравнительную таблицу.</div></section>
+    <p class="foot">Оценка — вспомогательная: больше всего баллов дают колёса, амортизация и комфорт ребёнка. Это не рейтинг безопасности и не замена проверке коляски в магазине. Размеры и границы в чек-листе — ваши ориентиры, а не обязательные нормативы.</p>
+  </main>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+(()=>{'use strict';
+  const criteria=[
+    {id:'wheels',title:'Колёса',weight:13,min:['Передние от 19 см, задние от 27 см','Резина, PU, качественные непрокалываемые или надувные шины','Передние поворотные, фиксируются прямо'],good:['Передние 20–22 см, задние 29–30 см','Износостойкие шины, хорошее сцепление и протектор'],ideal:['Передние 22–25 см, задние 30–33 см','Качественное покрытие, уверенное сцепление','Быстросъёмные колёса']},
+    {id:'suspension',title:'Амортизация',weight:15,min:['На передней и задней части: пружины, эластомеры или их комбинация','Допустима схема с амортизацией рамы вместо отдельного заднего амортизатора'],good:['Независимая работа передней и задней подвески','Мягкий ход по плитке и неровному асфальту'],ideal:['Отличное гашение ударов без сильной раскачки','Дополнительная амортизация рамы','Регулировка жёсткости — плюс, но не обязательна']},
+    {id:'size',title:'Вес и ширина',weight:9,min:['Вес с люлькой до 14 кг','Ширина шасси до 63 см; реально проходит в лифт'],good:['Вес с люлькой до 12,5–13 кг','Ширина шасси 58–61 см'],ideal:['Вес с люлькой до 11,5–12 кг','Ширина 58–60 см без потери устойчивости']},
+    {id:'cot',title:'Люлька',weight:8,min:['Внутренние размеры от 75×33 см','Ровное жёсткое основание и штатный твёрдый матрас','Люлька снимается с шасси'],good:['От 78×35 см, вес люльки до 4,5 кг','Удобное снятие и защита от ветра'],ideal:['От 80×36 см, вес до 4 кг','Снятие одной рукой; складная конструкция','Регулировка высоты установки — плюс']},
+    {id:'cotvent',title:'Вентиляция люльки',weight:8,min:['Две открываемые зоны: капюшон и изголовье','Сетчатые панели закрываются от ветра и холода'],good:['Большие панели в капюшоне и изголовье','Возможность сквозного проветривания'],ideal:['Большие регулируемые панели с удобным доступом','Дополнительно вентилируемое основание люльки']},
+    {id:'seat',title:'Прогулочный блок',weight:10,min:['Реверсивный: лицом к родителям и вперёд','Регулируемые спинка и подножка','Защитный капюшон'],good:['Допустимая масса ребёнка до 22 кг','Ширина сиденья от 34 см','Длина поверхности для отдыха от 95 см'],ideal:['Ширина от 36 см, отдых от 100 см','Регулировка высоты капюшона','Удобная регулировка спинки одной рукой']},
+    {id:'seatvent',title:'Вентиляция прогулочного блока',weight:6,min:['Открываемая сетчатая секция в капюшоне','Воздухопроницаемая конструкция спинки'],good:['Отдельные зоны в капюшоне и спинке','Открываемая сетчатая панель в спинке'],ideal:['Большие вентиляционные окна','Дышащая ткань сиденья','Вентиляция подножки — дополнительный плюс']},
+    {id:'belts',title:'Ремни и фиксация',weight:4,min:['Пятиточечные ремни','Регулировка плечевых лямок по высоте и длине','Надёжная застёжка'],good:['Мягкие накладки','Быстрая и удобная регулировка и фиксация'],ideal:['Магнитная застёжка — плюс','Натяжение одним движением','Перестановка по росту без сложной разборки']},
+    {id:'handle',title:'Ручка родителей',weight:5,min:['Подходит для 165 см и 187 см','Ноги не задевают заднюю ось при широком шаге'],good:['Ориентир диапазона 92–110 см','Удобная регулировка и покрытие'],ideal:['Ориентир диапазона 90–112 см','Простая регулировка одной рукой','Обоим удобно вести одной рукой']},
+    {id:'fold',title:'Складывание и машина',weight:7,min:['Света самостоятельно складывает и поднимает шасси','Помещается в багажник Changan CS75 Plus'],good:['Можно складывать вместе с прогулочным блоком','Компактность: ориентир до 85×62×40 см'],ideal:['Складывание одной рукой','Стоит и фиксируется в сложенном виде','Люлька тоже компактно складывается']},
+    {id:'fabrics',title:'Ткани и защита от погоды',weight:3,min:['Водоотталкивающая ткань и защита от ветра','Глубокий капюшон; ткань очищается'],good:['Защита капюшона UPF 50+','Съёмные стираемые внутренние ткани'],ideal:['Качественная стойкая ткань и швы','Удобное снятие обивки, хорошие молнии','Долговременное сохранение внешнего вида']},
+    {id:'basket',title:'Корзина',weight:2,min:['Корзина есть, доступ удобный и крепления надёжные'],good:['Допустимая нагрузка от 5 кг','Доступ с разных сторон'],ideal:['Нагрузка от 8–10 кг','Вместительная, есть защита от грязи']},
+    {id:'extras',title:'Комплектация',weight:2,min:['Дождевик, москитка и накидка на люльку входят в бюджет покупки'],good:['Также накидка на ноги прогулочного блока','Сумка или рюкзак для родителей'],ideal:['Нужные зимние аксессуары','Всё нужное без выхода за бюджет 80 тыс. ₽']},
+    {id:'quality',title:'Качество и долговечность',weight:3,min:['Надёжные крепления и тормоза','Нет опасных люфтов и дефектов','Доступны ремонт или запасные детали'],good:['Качественные подшипники и механизмы','Запчасти и сервис реально доступны'],ideal:['Высокое качество сборки','Долговечная рама и подвеска','Хорошая поддержка производителя']},
+    {id:'look',title:'Внешний вид',weight:5,min:['Внешний вид устраивает обоих'],good:['Современный дизайн и приятные материалы','Свете нравится расцветка и отделка'],ideal:['Дизайн очень нравится Свете','Премиальные детали и качество отделки']}
+  ];
+  const safety=[
+    {id:'brake',title:'Тормоз удерживает коляску'},
+    {id:'locks',title:'Шасси и оба блока надёжно фиксируются'},
+    {id:'harness',title:'Пятиточечные ремни работают и регулируются'},
+    {id:'cotflat',title:'В люльке ровная твёрдая поверхность'},
+    {id:'cert',title:'Документы и ограничения производителя проверены'}
+  ];
+  const KEY='stroller-checklist-v2';
+  const ratingLabels={none:'Не проверено',fail:'Ниже минимума',min:'Минимум',good:'Хорошо',ideal:'Идеально'};
+  const point={fail:0,min:1,good:2,ideal:3};
+  const blank=()=>({id:null,name:'',price:'',condition:'Новая',ratings:{},notes:{},safety:{}});
+  let saved=[],draft=blank();
+  const $=id=>document.getElementById(id);
+  function esc(x){return String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+  function notify(msg){const n=$('toast');n.textContent=msg;n.classList.add('visible');clearTimeout(notify.t);notify.t=setTimeout(()=>n.classList.remove('visible'),2800)}
+  function persist(){try{localStorage.setItem(KEY,JSON.stringify({saved,draft}))}catch(err){$('draftTag').textContent='Нет доступа к памяти — используй экспорт';$('draftTag').className='tag bad'}}
+  function load(){try{const x=JSON.parse(localStorage.getItem(KEY)||'null');if(x&&Array.isArray(x.saved)){saved=x.saved.filter(v=>v&&typeof v==='object');if(x.draft&&typeof x.draft==='object')draft={...blank(),...x.draft};}}catch(err){notify('Не удалось прочитать предыдущие данные')}}
+  function evaluation(model){let sum=0,totalWeight=0,checked=0,fail=0;for(const c of criteria){let r=model.ratings?.[c.id]||'none';if(r!=='none'&&Object.prototype.hasOwnProperty.call(point,r)){checked++;totalWeight+=c.weight;sum+=c.weight*point[r]/3;if(r==='fail')fail++;}}
+    const score=totalWeight?Math.round(100*sum/totalWeight):null;let safeDone=0,safeNo=0;for(const s of safety){const val=model.safety?.[s.id];if(val==='yes'||val==='no')safeDone++;if(val==='no')safeNo++;}
+    let status='Пока нет оценки';if(safeNo)status='Не подходит: проблема безопасности';else if(fail)status=`Есть несоответствия минимуму (${fail})`;else if(checked===0)status='Начни с характеристик';else if(checked<criteria.length||safeDone<safety.length)status='Предварительная оценка';else if(score>=85)status='Отличный кандидат';else if(score>=70)status='Хороший кандидат';else status='Стоит сравнить с другими';
+    return {score,checked,fail,safeDone,safeNo,status};}
+  function badge(type){return `<span class="rating-chip ${type==='none'?'':type}">${esc(ratingLabels[type]||'Не проверено')}</span>`}
+  function renderCriteria(){ $('criteria').innerHTML=criteria.map((c,i)=>{
+    const level=(type,label)=>`<div class="level ${type}"><b>${label}</b><ul>${c[type].map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`;
+    const buttons=['none','fail','min','good','ideal'].map(r=>`<button type="button" class="rate" data-criterion="${c.id}" data-value="${r}" aria-pressed="false">${esc(ratingLabels[r])}</button>`).join('');
+    return `<details class="criterion" id="sec-${c.id}" ${i===0?'open':''}><summary><div><span class="summary-name">${i+1}. ${esc(c.title)}</span><span class="summary-weight">Вес ${c.weight}%</span></div><span class="head-right"><span id="chip-${c.id}">${badge('none')}</span><span class="chevron">⌄</span></span></summary><div class="criterion-body"><div class="levels">${level('min','Минимум')}${level('good','Хорошо')}${level('ideal','Идеально')}</div><div class="rate-label">Какой уровень соответствует этой коляске?</div><div class="ratings">${buttons}</div><label class="note-label" for="note-${c.id}">Замеры, особенности и впечатления (необязательно)</label><textarea class="note" id="note-${c.id}" data-note="${c.id}" placeholder="Например: передние 22 см, задние 30 см; плавный ход"></textarea></div></details>`;
+  }).join('');}
+  function renderSafety(){ $('safetyItems').innerHTML=safety.map(s=>`<div class="safety-row"><div class="safety-name">${esc(s.title)}</div><div class="safety-options">${[['none','Не проверено'],['yes','Да'],['no','Нет']].map(([v,t])=>`<button type="button" data-safety="${s.id}" data-value="${v}">${t}</button>`).join('')}</div></div>`).join('')}
+  function syncForm(){ $('editorTitle').textContent=draft.id?'Редактирование коляски':'Новая коляска';$('modelName').value=draft.name||'';$('price').value=draft.price||'';$('condition').value=draft.condition||'Новая';
+    for(const c of criteria){const r=draft.ratings?.[c.id]||'none';const chip=$('chip-'+c.id);chip.innerHTML=badge(r);for(const b of document.querySelectorAll(`[data-criterion="${c.id}"]`)){let active=b.dataset.value===r;b.classList.toggle('active',active);b.setAttribute('aria-pressed',active?'true':'false')} $('note-'+c.id).value=draft.notes?.[c.id]||'';}
+    for(const s of safety){const v=draft.safety?.[s.id]||'none';for(const b of document.querySelectorAll(`[data-safety="${s.id}"]`)){b.classList.toggle('active',b.dataset.value===v);b.classList.toggle('no',b.dataset.value==='no')}}
+    updateScore();}
+  function updateScore(){const e=evaluation(draft);$('donut').style.background=`conic-gradient(var(--accent) ${(e.score||0)*3.6}deg,var(--line) 0deg)`;$('scoreValue').innerHTML=e.score===null?'—':`${e.score}<small>/100</small>`;$('scoreStatus').textContent=e.status;
+    $('scoreHelp').textContent=e.score===null?'Выбирай уровень по каждому разделу':`Оценка по отмеченным пунктам; непроверенные не учитываются в среднем балле.`;
+    $('scoreMeta').innerHTML=`<span class="tag">Оценено ${e.checked}/15</span><span class="tag ${e.safeNo?'bad':e.safeDone===5?'good':''}">Безопасность ${e.safeDone}/5${e.safeNo?', есть проблема':''}</span>${e.fail?`<span class="tag bad">Ниже минимума: ${e.fail}</span>`:''}`;
+    $('sectionsDone').textContent=`${e.checked} из 15 оценено`;}
+  function syncOne(id){let r=draft.ratings?.[id]||'none';$('chip-'+id).innerHTML=badge(r);for(const b of document.querySelectorAll(`[data-criterion="${id}"]`)){b.classList.toggle('active',b.dataset.value===r);b.setAttribute('aria-pressed',String(b.dataset.value===r))}updateScore();persist()}
+  function syncSafety(id){let v=draft.safety?.[id]||'none';for(const b of document.querySelectorAll(`[data-safety="${id}"]`)){b.classList.toggle('active',b.dataset.value===v);b.classList.toggle('no',b.dataset.value==='no')}updateScore();persist()}
+  function save(){let name=draft.name?.trim();if(!name){$('modelName').focus();notify('Сначала введи название коляски');return false}draft.name=name;
+    if(!draft.id)draft.id='c'+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+    const record=JSON.parse(JSON.stringify(draft));const index=saved.findIndex(x=>x.id===draft.id);if(index<0)saved.push(record);else saved[index]=record;persist();renderSaved();renderComparison();notify('Коляска сохранена');syncForm();return true;}
+  function startNew(ask){let unsaved=draft.name||Object.values(draft.ratings||{}).some(v=>v!=='none')||Object.values(draft.notes||{}).some(Boolean)||Object.values(draft.safety||{}).some(v=>v!=='none');if(ask&&unsaved&&!confirm('Создать новую анкету? Несохранённые изменения текущей модели будут потеряны.'))return;draft=blank();persist();syncForm();document.querySelectorAll('.criterion').forEach((d,i)=>d.open=i===0);$('editorTop').scrollIntoView({behavior:'smooth'});}
+  function reset(){if(!confirm('Сбросить все оценки, заметки и проверки безопасности у текущей коляски? Название и цена сохранятся.'))return;draft.ratings={};draft.notes={};draft.safety={};persist();syncForm();notify('Отметки сброшены')}
+  function renderSaved(){ $('savedCount').textContent=`(${saved.length})`;
+    if(!saved.length){$('savedList').innerHTML='<div class="empty">Пока пусто. Заполни анкету и нажми «Сохранить и добавить другую».</div>';return}
+    $('savedList').innerHTML=saved.map(x=>{const e=evaluation(x);const price=x.price?Number(x.price).toLocaleString('ru-RU')+' ₽':'Цена не указана';
+      return `<div class="saved"><div class="saved-title">${esc(x.name)}</div><div class="saved-info">${esc(x.condition||'Новая')} · ${price} · ${e.checked}/15 характеристик · безопасность ${e.safeDone}/5</div><div class="saved-score">${e.score===null?'—':e.score+'/100'}</div><div class="small ${e.safeNo||e.fail?'muted':''}">${esc(e.status)}</div><div class="saved-actions"><button class="btn soft" data-edit="${esc(x.id)}">Открыть и изменить</button><button class="btn" data-copy="${esc(x.id)}">Копия</button><button class="btn danger" data-delete="${esc(x.id)}">Удалить</button></div></div>`;}).join('')}
+  function renderComparison(){if(saved.length<2){$('comparison').className='empty';$('comparison').textContent='Сохрани хотя бы две коляски, чтобы увидеть сравнительную таблицу.';return}
+    const cols=saved.map(x=>{const e=evaluation(x);return `<th>${esc(x.name)}<div class="small muted">${e.score??'—'}/100 · ${e.checked}/15</div></th>`}).join('');
+    const rows=[{title:'Цена',get:x=>x.price?Number(x.price).toLocaleString('ru-RU')+' ₽':'—'},{title:'Состояние',get:x=>x.condition||'—'},{title:'Безопасность',get:x=>{const e=evaluation(x);return e.safeNo?'Есть проблема':`${e.safeDone}/5 проверено`}},...criteria.map(c=>({title:c.title,get:x=>ratingLabels[x.ratings?.[c.id]||'none']}))];
+    $('comparison').className='comparison';$('comparison').innerHTML=`<table class="compare"><thead><tr><th>Характеристика</th>${cols}</tr></thead><tbody>${rows.map(r=>`<tr><td>${esc(r.title)}</td>${saved.map(x=>`<td>${esc(r.get(x))}</td>`).join('')}</tr>`).join('')}</tbody></table>`;}
+  function download(){const data={format:'stroller-checklist-v2',exportedAt:new Date().toISOString(),saved,draft};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='kolyaski-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);notify('Резервная копия подготовлена');}
+  function importData(file){if(!file)return;const rd=new FileReader();rd.onload=()=>{try{const data=JSON.parse(rd.result);if(!Array.isArray(data.saved)||!data.saved.every(x=>x&&typeof x.name==='string'))throw Error('invalid');if(!confirm(`Загрузить ${data.saved.length} колясок? Это заменит текущие сохранённые результаты.`))return;saved=data.saved;draft=data.draft&&typeof data.draft==='object'?{...blank(),...data.draft}:blank();persist();syncForm();renderSaved();renderComparison();notify('Результаты восстановлены')}catch(err){alert('Файл не похож на резервную копию чек-листа.')}};rd.readAsText(file)}
+  document.addEventListener('click',e=>{
+    const rate=e.target.closest('[data-criterion]');if(rate){draft.ratings[rate.dataset.criterion]=rate.dataset.value;syncOne(rate.dataset.criterion);return}
+    const safe=e.target.closest('[data-safety]');if(safe){draft.safety[safe.dataset.safety]=safe.dataset.value;syncSafety(safe.dataset.safety);return}
+  });
+  // Обработчики списка сохранённых моделей отделены от обработчиков чек-листа.
+  $('savedList').addEventListener('click',e=>{
+    const id=e.target.dataset.edit||e.target.dataset.copy||e.target.dataset.delete;if(!id)return;const record=saved.find(v=>v.id===id);if(!record)return;
+    if(e.target.dataset.delete){if(!confirm(`Удалить «${record.name}» из сохранённых?`))return;saved=saved.filter(v=>v.id!==id);if(draft.id===id)draft.id=null;persist();renderSaved();renderComparison();notify('Коляска удалена');return}
+    if(e.target.dataset.edit){if(draft.name&&draft.id!==id&&!confirm('Открыть сохранённую коляску? Несохранённые изменения текущей анкеты будут потеряны.'))return;draft=JSON.parse(JSON.stringify(record));persist();syncForm();$('editorTop').scrollIntoView({behavior:'smooth'});return}
+    if(e.target.dataset.copy){draft=JSON.parse(JSON.stringify(record));draft.id=null;draft.name=record.name+' (копия)';persist();syncForm();$('editorTop').scrollIntoView({behavior:'smooth'});notify('Создана копия анкеты');}
+  });
+  $('modelName').addEventListener('input',e=>{draft.name=e.target.value;persist()});$('price').addEventListener('input',e=>{draft.price=e.target.value;persist()});$('condition').addEventListener('change',e=>{draft.condition=e.target.value;persist()});
+  $('criteria').addEventListener('input',e=>{if(e.target.dataset.note){draft.notes[e.target.dataset.note]=e.target.value;persist()}});
+  $('saveCurrent').addEventListener('click',save);$('saveNext').addEventListener('click',()=>{if(save())startNew(false)});$('saveNextBottom').addEventListener('click',()=>{if(save())startNew(false)});
+  $('newBtn').addEventListener('click',()=>startNew(true));$('resetBtn').addEventListener('click',reset);$('scrollTop').addEventListener('click',()=>$('editorTop').scrollIntoView({behavior:'smooth'}));
+  $('exportBtn').addEventListener('click',download);$('importBtn').addEventListener('click',()=>$('importFile').click());$('importFile').addEventListener('change',e=>{importData(e.target.files?.[0]);e.target.value=''});
+  load();renderCriteria();renderSafety();syncForm();renderSaved();renderComparison();
+  // Signal successful initialization; the pre-rendered criteria remain usable as reference in no-JS previews.
+  $('scriptWarning').hidden=true;
+})();
+</script>
+</body>
+</html>
