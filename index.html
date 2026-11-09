@@ -20,6 +20,20 @@
     .field input,.field select,.note-field,.note{background:#fff;width:100%;border:1px solid #cfdbd4;border-radius:10px;min-height:43px;padding:10px 12px;color:var(--ink);outline:none}
     .field input:focus,.field select:focus,.note:focus{border-color:var(--accent);box-shadow:0 0 0 3px #176d5d1b}
     .hint{font-size:12px;color:var(--muted);margin:9px 0 0}
+    .photo-area{margin-top:15px;padding-top:14px;border-top:1px solid var(--line)}
+    .photo-header{font-size:14px;font-weight:750;margin:0 0 9px}
+    .photo-controls{display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap}
+    .photo-frame{width:132px;height:132px;border:1px dashed #bbd0c4;border-radius:12px;background:#f4f8f5;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;color:var(--muted);font-size:12px;text-align:center}
+    .photo-frame img{width:100%;height:100%;object-fit:cover;display:block}
+    .photo-buttons{display:flex;gap:7px;flex-wrap:wrap;align-items:flex-start;flex:1}
+    .photo-buttons .btn{min-height:40px}
+    .photo-buttons .hint{width:100%;margin-top:0}
+    .photo-thumb{width:76px;height:76px;object-fit:cover;flex-shrink:0;border-radius:9px;background:#f0f3f0}
+    .saved-ident{display:flex;align-items:flex-start;gap:10px}
+    .saved-ident-text{min-width:0;flex:1}
+    .compare-thumb{width:66px;height:66px;display:block;object-fit:cover;border-radius:9px;margin-bottom:5px}
+    .photo-error{color:var(--bad);font-size:12px;margin:8px 0 0}
+    [hidden]{display:none!important}
     .score-area{display:grid;grid-template-columns:100px 1fr;gap:15px;align-items:center}.donut{height:96px;width:96px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--accent) 0deg,var(--line) 0deg);position:relative}
     .donut:after{content:"";background:#fff;position:absolute;inset:10px;border-radius:50%}.score-num{position:relative;z-index:1;font-weight:800;font-size:26px}.score-num small{font-size:11px;color:var(--muted);font-weight:600}
     .status{font-size:17px;font-weight:750;margin-bottom:3px}.muted{color:var(--muted)}.small{font-size:12px}.score-meta{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}.tag{font-size:12px;padding:4px 8px;background:#eef2ef;border-radius:30px;color:#526660}.tag.bad{color:var(--bad);background:var(--bad-bg)}.tag.good{color:#176454;background:var(--accent-soft)}
@@ -60,6 +74,21 @@
         <div class="field first"><label for="modelName">Модель и версия *</label><input id="modelName" placeholder="Например, Tutis Uno 6+" autocomplete="off" maxlength="110"></div>
         <div class="field"><label for="price">Цена, ₽</label><input id="price" type="number" min="0" max="2000000" inputmode="numeric" placeholder="75000"></div>
         <div class="field"><label for="condition">Состояние</label><select id="condition"><option value="Новая">Новая</option><option value="Б/у">Б/у</option></select></div>
+      </div>
+      <div class="photo-area">
+        <div class="photo-header">Фотография коляски</div>
+        <div class="photo-controls">
+          <div class="photo-frame" id="photoPreview" aria-label="Фотография текущей коляски">Фото пока нет</div>
+          <div class="photo-buttons">
+            <button class="btn soft" type="button" id="takePhoto">📷 Сделать фото</button>
+            <button class="btn" type="button" id="choosePhoto">Из галереи</button>
+            <button class="btn danger" type="button" id="removePhoto" hidden>Удалить фото</button>
+            <p class="hint">Одно фото для каждой модели. Снимок автоматически уменьшается для экономии памяти телефона и попадёт в резервную копию JSON.</p>
+          </div>
+        </div>
+        <input type="file" id="cameraPhotoFile" accept="image/*" capture="environment" hidden aria-label="Сделать фото коляски">
+        <input type="file" id="galleryPhotoFile" accept="image/*,.heic,.heif" hidden aria-label="Выбрать фотографию коляски">
+        <p id="photoError" class="photo-error" role="alert" hidden></p>
       </div>
       <p class="hint">Отмечай уровень целиком по описанию в блоке. «Не проверено» не снижает оценку, но влияет на полноту. «Ниже минимума» отмечает конкретный недостаток. К каждому разделу можно добавить размеры и личные впечатления.</p>
       <div class="buttonbar"><button class="btn primary" id="saveNext">Сохранить и добавить другую</button><button class="btn soft" id="saveCurrent">Сохранить</button><button class="btn" id="newBtn">Новая пустая</button><button class="btn danger" id="resetBtn">Сбросить отметки</button></div>
@@ -212,7 +241,7 @@
       <div class="section-head" style="margin:0 0 8px"><h2>Сохранённые коляски <span id="savedCount" class="muted"></span></h2></div>
       <div id="savedList" class="saved-list"></div>
       <div class="buttonbar"><button class="btn soft" id="exportBtn">Скачать резервную копию JSON</button><button class="btn" id="importBtn">Загрузить резервную копию</button><input hidden type="file" id="importFile" accept=".json,application/json"></div>
-      <p class="hint">Данные автоматически сохраняются в браузере на этом устройстве. Для надёжности после осмотра нескольких моделей скачай резервную копию: хранение в браузере может быть очищено приложением или системой.</p>
+      <p class="hint">Данные и уменьшенные фотографии сохраняются в Safari на этом устройстве. Для надёжности скачивай резервную копию JSON: она содержит фотографии и оценки и позволит восстановить их при смене телефона или очистке памяти.</p>
     </section>
 
     <section class="panel" id="comparisonSection"><h2>Сравнение моделей</h2><div id="comparison" class="empty">Сохрани хотя бы две коляски, чтобы увидеть сравнительную таблицу.</div></section>
@@ -248,17 +277,82 @@
   const KEY='stroller-checklist-v2';
   const ratingLabels={none:'Не проверено',fail:'Ниже минимума',min:'Минимум',good:'Хорошо',ideal:'Идеально'};
   const point={fail:0,min:1,good:2,ideal:3};
-  const blank=()=>({id:null,name:'',price:'',condition:'Новая',ratings:{},notes:{},safety:{}});
+  const blank=()=>({id:null,name:'',price:'',condition:'Новая',photo:null,ratings:{},notes:{},safety:{}});
   let saved=[],draft=blank();
   const $=id=>document.getElementById(id);
   function esc(x){return String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
   function notify(msg){const n=$('toast');n.textContent=msg;n.classList.add('visible');clearTimeout(notify.t);notify.t=setTimeout(()=>n.classList.remove('visible'),2800)}
-  function persist(){try{localStorage.setItem(KEY,JSON.stringify({saved,draft}))}catch(err){$('draftTag').textContent='Нет доступа к памяти — используй экспорт';$('draftTag').className='tag bad'}}
+  function persist(){try{localStorage.setItem(KEY,JSON.stringify({saved,draft}));$('draftTag').textContent='Черновик сохраняется';$('draftTag').className='tag';return true}catch(err){$('draftTag').textContent='Память заполнена — скачай JSON';$('draftTag').className='tag bad';return false}}
   function load(){try{const x=JSON.parse(localStorage.getItem(KEY)||'null');if(x&&Array.isArray(x.saved)){saved=x.saved.filter(v=>v&&typeof v==='object');if(x.draft&&typeof x.draft==='object')draft={...blank(),...x.draft};}}catch(err){notify('Не удалось прочитать предыдущие данные')}}
   function evaluation(model){let sum=0,totalWeight=0,checked=0,fail=0;for(const c of criteria){let r=model.ratings?.[c.id]||'none';if(r!=='none'&&Object.prototype.hasOwnProperty.call(point,r)){checked++;totalWeight+=c.weight;sum+=c.weight*point[r]/3;if(r==='fail')fail++;}}
     const score=totalWeight?Math.round(100*sum/totalWeight):null;let safeDone=0,safeNo=0;for(const s of safety){const val=model.safety?.[s.id];if(val==='yes'||val==='no')safeDone++;if(val==='no')safeNo++;}
     let status='Пока нет оценки';if(safeNo)status='Не подходит: проблема безопасности';else if(fail)status=`Есть несоответствия минимуму (${fail})`;else if(checked===0)status='Начни с характеристик';else if(checked<criteria.length||safeDone<safety.length)status='Предварительная оценка';else if(score>=85)status='Отличный кандидат';else if(score>=70)status='Хороший кандидат';else status='Стоит сравнить с другими';
     return {score,checked,fail,safeDone,safeNo,status};}
+  // В качестве фотографии сохраняем только JPEG, созданный самим браузером.
+  // Это защищает атрибуты HTML и не позволяет вставить сторонние URL из JSON.
+  function safePhoto(photo){return typeof photo==='string'&&/^data:image\/jpeg;base64,[a-zA-Z0-9+/=]+$/.test(photo)&&photo.length<500000?photo:null}
+  function syncPhoto(){
+    const photo=safePhoto(draft.photo);
+    $('photoPreview').innerHTML=photo?`<img alt="Фото коляски" src="${photo}">`:'Фото пока нет';
+    $('removePhoto').hidden=!photo;
+    $('photoError').hidden=true;
+  }
+  function showPhotoError(message){$('photoError').textContent=message;$('photoError').hidden=false;notify(message)}
+  function shrinkPhoto(file){
+    return new Promise((resolve,reject)=>{
+      if(!file||(!file.type.startsWith('image/')&&!/\.(heic|heif|jpe?g|png|webp)$/i.test(file.name))){reject(new Error('Выбери фотографию в формате JPG, PNG или HEIC.'));return}
+      if(file.size>30*1024*1024){reject(new Error('Файл больше 30 МБ. Выбери другое фото.'));return}
+      const objectUrl=URL.createObjectURL(file);
+      const image=new Image();
+      image.onload=()=>{
+        URL.revokeObjectURL(objectUrl);
+        try{
+          const width=image.naturalWidth,height=image.naturalHeight;
+          if(!width||!height)throw new Error('Не удалось прочитать размеры фотографии.');
+          let result=null;
+          for(const maxSide of [1200,1000,850,720,600]){
+            const scale=Math.min(1,maxSide/Math.max(width,height));
+            const canvas=document.createElement('canvas');
+            canvas.width=Math.max(1,Math.round(width*scale));
+            canvas.height=Math.max(1,Math.round(height*scale));
+            const ctx=canvas.getContext('2d');
+            if(!ctx)throw new Error('Браузер не поддерживает обработку фотографий.');
+            ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);
+            ctx.drawImage(image,0,0,canvas.width,canvas.height);
+            for(const quality of [0.78,0.68,0.58]){
+              const data=canvas.toDataURL('image/jpeg',quality);
+              if(!safePhoto(data))continue;
+              result=data;
+              if(data.length<=235000){resolve(data);return}
+            }
+          }
+          if(result){resolve(result);return}
+          throw new Error('Не удалось уменьшить фотографию.');
+        }catch(error){reject(error)}
+      };
+      image.onerror=()=>{URL.revokeObjectURL(objectUrl);reject(new Error('Не удалось открыть фото. Попробуй другое или сохрани его в JPEG.'))};
+      image.src=objectUrl;
+    });
+  }
+  async function handlePhoto(file){
+    if(!file)return;
+    $('photoError').hidden=true;
+    const camera=$('takePhoto'),gallery=$('choosePhoto');
+    camera.disabled=true;gallery.disabled=true;
+    try{
+      const previous=draft.photo;
+      const photo=await shrinkPhoto(file);
+      draft.photo=photo;
+      if(!persist()){
+        draft.photo=previous;
+        persist();
+        throw new Error('Недостаточно свободного места для фото. Скачай резервную копию JSON или удали ненужные анкеты.');
+      }
+      syncPhoto();
+      notify('Фото добавлено. Не забудь сохранить анкету.');
+    }catch(error){showPhotoError(error.message||'Не удалось добавить фото.')}
+    finally{camera.disabled=false;gallery.disabled=false}
+  }
   function badge(type){return `<span class="rating-chip ${type==='none'?'':type}">${esc(ratingLabels[type]||'Не проверено')}</span>`}
   function renderCriteria(){ $('criteria').innerHTML=criteria.map((c,i)=>{
     const level=(type,label)=>`<div class="level ${type}"><b>${label}</b><ul>${c[type].map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`;
@@ -269,7 +363,7 @@
   function syncForm(){ $('editorTitle').textContent=draft.id?'Редактирование коляски':'Новая коляска';$('modelName').value=draft.name||'';$('price').value=draft.price||'';$('condition').value=draft.condition||'Новая';
     for(const c of criteria){const r=draft.ratings?.[c.id]||'none';const chip=$('chip-'+c.id);chip.innerHTML=badge(r);for(const b of document.querySelectorAll(`[data-criterion="${c.id}"]`)){let active=b.dataset.value===r;b.classList.toggle('active',active);b.setAttribute('aria-pressed',active?'true':'false')} $('note-'+c.id).value=draft.notes?.[c.id]||'';}
     for(const s of safety){const v=draft.safety?.[s.id]||'none';for(const b of document.querySelectorAll(`[data-safety="${s.id}"]`)){b.classList.toggle('active',b.dataset.value===v);b.classList.toggle('no',b.dataset.value==='no')}}
-    updateScore();}
+    syncPhoto();updateScore();}
   function updateScore(){const e=evaluation(draft);$('donut').style.background=`conic-gradient(var(--accent) ${(e.score||0)*3.6}deg,var(--line) 0deg)`;$('scoreValue').innerHTML=e.score===null?'—':`${e.score}<small>/100</small>`;$('scoreStatus').textContent=e.status;
     $('scoreHelp').textContent=e.score===null?'Выбирай уровень по каждому разделу':`Оценка по отмеченным пунктам; непроверенные не учитываются в среднем балле.`;
     $('scoreMeta').innerHTML=`<span class="tag">Оценено ${e.checked}/15</span><span class="tag ${e.safeNo?'bad':e.safeDone===5?'good':''}">Безопасность ${e.safeDone}/5${e.safeNo?', есть проблема':''}</span>${e.fail?`<span class="tag bad">Ниже минимума: ${e.fail}</span>`:''}`;
@@ -279,14 +373,15 @@
   function save(){let name=draft.name?.trim();if(!name){$('modelName').focus();notify('Сначала введи название коляски');return false}draft.name=name;
     if(!draft.id)draft.id='c'+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
     const record=JSON.parse(JSON.stringify(draft));const index=saved.findIndex(x=>x.id===draft.id);if(index<0)saved.push(record);else saved[index]=record;persist();renderSaved();renderComparison();notify('Коляска сохранена');syncForm();return true;}
-  function startNew(ask){let unsaved=draft.name||Object.values(draft.ratings||{}).some(v=>v!=='none')||Object.values(draft.notes||{}).some(Boolean)||Object.values(draft.safety||{}).some(v=>v!=='none');if(ask&&unsaved&&!confirm('Создать новую анкету? Несохранённые изменения текущей модели будут потеряны.'))return;draft=blank();persist();syncForm();document.querySelectorAll('.criterion').forEach((d,i)=>d.open=i===0);$('editorTop').scrollIntoView({behavior:'smooth'});}
+  function startNew(ask){let unsaved=draft.name||draft.photo||Object.values(draft.ratings||{}).some(v=>v!=='none')||Object.values(draft.notes||{}).some(Boolean)||Object.values(draft.safety||{}).some(v=>v!=='none');if(ask&&unsaved&&!confirm('Создать новую анкету? Несохранённые изменения текущей модели будут потеряны.'))return;draft=blank();persist();syncForm();document.querySelectorAll('.criterion').forEach((d,i)=>d.open=i===0);$('editorTop').scrollIntoView({behavior:'smooth'});}
   function reset(){if(!confirm('Сбросить все оценки, заметки и проверки безопасности у текущей коляски? Название и цена сохранятся.'))return;draft.ratings={};draft.notes={};draft.safety={};persist();syncForm();notify('Отметки сброшены')}
   function renderSaved(){ $('savedCount').textContent=`(${saved.length})`;
     if(!saved.length){$('savedList').innerHTML='<div class="empty">Пока пусто. Заполни анкету и нажми «Сохранить и добавить другую».</div>';return}
     $('savedList').innerHTML=saved.map(x=>{const e=evaluation(x);const price=x.price?Number(x.price).toLocaleString('ru-RU')+' ₽':'Цена не указана';
-      return `<div class="saved"><div class="saved-title">${esc(x.name)}</div><div class="saved-info">${esc(x.condition||'Новая')} · ${price} · ${e.checked}/15 характеристик · безопасность ${e.safeDone}/5</div><div class="saved-score">${e.score===null?'—':e.score+'/100'}</div><div class="small ${e.safeNo||e.fail?'muted':''}">${esc(e.status)}</div><div class="saved-actions"><button class="btn soft" data-edit="${esc(x.id)}">Открыть и изменить</button><button class="btn" data-copy="${esc(x.id)}">Копия</button><button class="btn danger" data-delete="${esc(x.id)}">Удалить</button></div></div>`;}).join('')}
+      const photo=safePhoto(x.photo);
+      return `<div class="saved"><div class="saved-ident">${photo?`<img class="photo-thumb" src="${photo}" alt="Фото ${esc(x.name)}" loading="lazy">`:''}<div class="saved-ident-text"><div class="saved-title">${esc(x.name)}</div><div class="saved-info">${esc(x.condition||'Новая')} · ${price} · ${e.checked}/15 характеристик · безопасность ${e.safeDone}/5</div></div></div><div class="saved-score">${e.score===null?'—':e.score+'/100'}</div><div class="small ${e.safeNo||e.fail?'muted':''}">${esc(e.status)}</div><div class="saved-actions"><button class="btn soft" data-edit="${esc(x.id)}">Открыть и изменить</button><button class="btn" data-copy="${esc(x.id)}">Копия</button><button class="btn danger" data-delete="${esc(x.id)}">Удалить</button></div></div>`;}).join('')}
   function renderComparison(){if(saved.length<2){$('comparison').className='empty';$('comparison').textContent='Сохрани хотя бы две коляски, чтобы увидеть сравнительную таблицу.';return}
-    const cols=saved.map(x=>{const e=evaluation(x);return `<th>${esc(x.name)}<div class="small muted">${e.score??'—'}/100 · ${e.checked}/15</div></th>`}).join('');
+    const cols=saved.map(x=>{const e=evaluation(x);const photo=safePhoto(x.photo);return `<th>${photo?`<img class="compare-thumb" src="${photo}" alt="Фото ${esc(x.name)}">`:''}${esc(x.name)}<div class="small muted">${e.score??'—'}/100 · ${e.checked}/15</div></th>`}).join('');
     const rows=[{title:'Цена',get:x=>x.price?Number(x.price).toLocaleString('ru-RU')+' ₽':'—'},{title:'Состояние',get:x=>x.condition||'—'},{title:'Безопасность',get:x=>{const e=evaluation(x);return e.safeNo?'Есть проблема':`${e.safeDone}/5 проверено`}},...criteria.map(c=>({title:c.title,get:x=>ratingLabels[x.ratings?.[c.id]||'none']}))];
     $('comparison').className='comparison';$('comparison').innerHTML=`<table class="compare"><thead><tr><th>Характеристика</th>${cols}</tr></thead><tbody>${rows.map(r=>`<tr><td>${esc(r.title)}</td>${saved.map(x=>`<td>${esc(r.get(x))}</td>`).join('')}</tr>`).join('')}</tbody></table>`;}
   function download(){const data={format:'stroller-checklist-v2',exportedAt:new Date().toISOString(),saved,draft};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='kolyaski-backup-'+new Date().toISOString().slice(0,10)+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);notify('Резервная копия подготовлена');}
@@ -302,6 +397,12 @@
     if(e.target.dataset.edit){if(draft.name&&draft.id!==id&&!confirm('Открыть сохранённую коляску? Несохранённые изменения текущей анкеты будут потеряны.'))return;draft=JSON.parse(JSON.stringify(record));persist();syncForm();$('editorTop').scrollIntoView({behavior:'smooth'});return}
     if(e.target.dataset.copy){draft=JSON.parse(JSON.stringify(record));draft.id=null;draft.name=record.name+' (копия)';persist();syncForm();$('editorTop').scrollIntoView({behavior:'smooth'});notify('Создана копия анкеты');}
   });
+  $('takePhoto').addEventListener('click',()=>$('cameraPhotoFile').click());
+  $('choosePhoto').addEventListener('click',()=>$('galleryPhotoFile').click());
+  for(const inputId of ['cameraPhotoFile','galleryPhotoFile']){
+    $(inputId).addEventListener('change',async e=>{const file=e.target.files?.[0];e.target.value='';await handlePhoto(file)});
+  }
+  $('removePhoto').addEventListener('click',()=>{if(!draft.photo)return;draft.photo=null;persist();syncPhoto();notify('Фото удалено из текущей анкеты')});
   $('modelName').addEventListener('input',e=>{draft.name=e.target.value;persist()});$('price').addEventListener('input',e=>{draft.price=e.target.value;persist()});$('condition').addEventListener('change',e=>{draft.condition=e.target.value;persist()});
   $('criteria').addEventListener('input',e=>{if(e.target.dataset.note){draft.notes[e.target.dataset.note]=e.target.value;persist()}});
   $('saveCurrent').addEventListener('click',save);$('saveNext').addEventListener('click',()=>{if(save())startNew(false)});$('saveNextBottom').addEventListener('click',()=>{if(save())startNew(false)});
